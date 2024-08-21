@@ -1,70 +1,65 @@
 %{	//Definitions
 	int linhas=1, erros=0;
+	
+	void print_token(char *tipo) {
+		printf("%s: %s\n", tipo, yytext);
+	}
 %}
 
-DIGITO	[0-9]
-ID	[A-Za-z][A-Za-z0-9]*
-ESPACO	[\t\r" "]
+DIGITO	   [0-9]
+ID	   [A-Za-z][A-Za-z0-9]*
+ESPACO	   [\t\r" "]
+FLUXO	   se|senao|por|enquanto|execute|retorne
+TIPO	   inteiro|real|caractere|literal
+SEPARADOR  [,;{}[\]()]
+ATRIBUICAO "="|"+="|"-="
+ARIT_UN	   "++"|"--"
+ARIT_BIN   "+"|"-"|"*"|"/"|"%"
+OP_LOGICO  "&&"|"||"|"=="|"!"
 
-%%	//Rules
+%%	//Rules -----------------------------------------------------------------------
 {ESPACO} //reconhece um espaço em branco
 
-se|senao|por|enquanto|execute {
-	printf("Palavra reservada: %s\n", yytext);
-} //reconhece uma palavra reservada para controle de fluxo
+{FLUXO}|{TIPO} {
+	print_token("Palavra reservada");
+} //reconhece uma palavra reservada para controle de fluxo ou nome de tipo de dado
 
-inteiro|real|caractere|literal {
-	printf("Palavra reservada: %s\n", yytext);
-} //reconhece uma palavra reservada para tipo de dado
-
-","|";"|"{"|"}"|"["|"]"|"("|")" {
-	printf("Separador: %s\n", yytext);
+{SEPARADOR} {
+	print_token("Separador");
 } //reconhece um separador
 
-"="|"+="|"-=" {
+{ATRIBUICAO} {
 	printf("Atribuição: %s\n", yytext);
 } //reconhece símbolos de atribuição
 
 {DIGITO}+{ID} {
-	printf("Identificador inválido: %s - ", yytext);
+	printf("ERRO: Identificador inválido: %s - ", yytext);
 	erros++;
 	printf("Linha: %d\n", linhas);
 } //reconhece um erro, um identificador que começa com um dígito
 
 {ID}{DIGITO}*{ID}* {
-	printf("Identificador: %s\n", yytext);
+	print_token("Identificador");
 } //reconhece um identificador
 
-{DIGITO}+ {
-	printf("Inteiro: %s\n", yytext);
-} //reconhece um número inteiro
+"-"?{DIGITO}+ {
+	print_token("Inteiro");
+} //reconhece um número inteiro (positivo ou negativo)
 
-"-"{DIGITO}+ {
-	printf("Inteiro: %s\n", yytext);
-} //reconhece um número inteiro negativo
+"-"?{DIGITO}+"."{DIGITO}+ {
+	print_token("Real");
+} //reconhece um número real (positivo ou negativo)
 
-{DIGITO}+"."{DIGITO}+ {
-	printf("Real: %s\n", yytext);
-} //reconhece um número real
+{ARIT_UN}|{ARIT_BIN} {
+	print_token("Operador aritmético");
+} //reconhece um símbolo de operação aritmética unária ou binária
 
-"-"{DIGITO}+"."{DIGITO}+ {
-	printf("Real: %s\n", yytext);
-} //reconhece um número real negativo
-
-"++"|"--" {
-	printf("Operador: %s\n", yytext);
-} //reconhece um símbolo de operação aritmética unária
-
-"+"|"-"|"*"|"/"|"%" {
-	printf("Operador: %s\n", yytext);
-} //reconhece um símbolo de operação aritmética binária
-
-"&&"|"||"|"=="|"!" {
-	printf("Operador: %s\n", yytext);
+{OP_LOGICO} {
+	print_token("Operador lógico");
 } //reconhece um símbolo de operação lógica
 
 "//"[^\n]* {
-	printf("Comentários\n");
+	print_token("Comentário");
 } //reconhece comentários de uma única linha
 
 \n {
@@ -79,7 +74,7 @@ inteiro|real|caractere|literal {
 
 %%
 
-//Code
+//Code ---------------------------------------------------------------------------------
 
 int yywrap();
 

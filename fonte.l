@@ -1,9 +1,19 @@
 %{	//Definitions
 	int linhas=1, erros=0;
 	
+	// função auxiliar para imprimir informações de um token
 	void print_token(char *tipo) {
 		printf("%s: %s\n", tipo, yytext);
 	}
+	
+	// função auxiliar para imprimir uma mensagem de erro e contabilizá-lo
+	void report_error(const char* menssagem, const char* token, int linha) {
+	    printf("\033[31;1m");
+	    printf("ERRO: %s: %s - Linha: %d\n", menssagem, token, linha);
+	    printf("\033[0m");
+	    erros++;
+	}
+	
 %}
 
 DIGITO	   [0-9]
@@ -18,7 +28,15 @@ ARIT_BIN   "+"|"-"|"*"|"/"|"%"
 OP_LOGICO  "&&"|"||"|"=="|"!"
 
 %%	//Rules -----------------------------------------------------------------------
-{ESPACO} //reconhece um espaço em branco
+{ESPACO}+ //reconhece um ou mais espaços em branco
+
+\n+ {
+	linhas += yyleng;
+} //reconhece e contabiliza mudanças de linha
+
+"//"[^\n]* {
+	print_token("Comentário");
+} //reconhece comentários de uma única linha
 
 {FLUXO}|{TIPO} {
 	print_token("Palavra reservada");
@@ -29,26 +47,28 @@ OP_LOGICO  "&&"|"||"|"=="|"!"
 } //reconhece um separador
 
 {ATRIBUICAO} {
-	printf("Atribuição: %s\n", yytext);
+	print_token("Atribuição");
 } //reconhece símbolos de atribuição
-
-{DIGITO}+{ID} {
-	printf("ERRO: Identificador inválido: %s - ", yytext);
-	erros++;
-	printf("Linha: %d\n", linhas);
-} //reconhece um erro, um identificador que começa com um dígito
 
 {ID}{DIGITO}*{ID}* {
 	print_token("Identificador");
 } //reconhece um identificador
 
-"-"?{DIGITO}+ {
-	print_token("Inteiro");
-} //reconhece um número inteiro (positivo ou negativo)
+"-"?{DIGITO}+"."{DIGITO}*({ID}|[{}\[\]()])+ {
+	report_error("Número real com parte decimal incorreta", yytext, linhas);
+} //reconhece um erro, um número real com a parte decimal não-numérica
 
 "-"?{DIGITO}+"."{DIGITO}+ {
 	print_token("Real");
 } //reconhece um número real (positivo ou negativo)
+
+"-"?{DIGITO}+({ID}|[{}\[\]()])+ {
+	report_error("Token inválido", yytext, linhas);
+} //reconhece um erro, um número seguido por um caractere não-dígito
+
+"-"?{DIGITO}+ {
+	print_token("Inteiro");
+} //reconhece um número inteiro (positivo ou negativo)
 
 {ARIT_UN}|{ARIT_BIN} {
 	print_token("Operador aritmético");
@@ -58,18 +78,8 @@ OP_LOGICO  "&&"|"||"|"=="|"!"
 	print_token("Operador lógico");
 } //reconhece um símbolo de operação lógica
 
-"//"[^\n]* {
-	print_token("Comentário");
-} //reconhece comentários de uma única linha
-
-\n {
-	linhas++;
-} //reconhece e contabiliza mudança de linha
-
 . {
-	printf("Token inválido: %s - ", yytext);
-	erros++;
-	printf("Linha: %d\n", linhas);
+	report_error("Token inválido", yytext, linhas);
 } //reconhece como erro qualquer coisa que não se encaixe como regra válida
 
 %%
@@ -80,7 +90,7 @@ int yywrap();
 
 int main() {
 	yylex();
-	printf("Total de erros encontrados: %d\n", erros);
+	printf("\nTotal de erros encontrados: %d\n", erros);
 	if (erros==0)
 		puts("\nCódigo analisado com sucesso!\n");
 }

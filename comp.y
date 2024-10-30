@@ -1,4 +1,4 @@
-%{
+%{  //Definitions ------------------------------------------------------------------------------------------------------
     #include "cabecalho.h"
     #include <stdio.h>
     #include <stdlib.h>
@@ -23,12 +23,11 @@
 
 %start Programa_principal
 
-%%
+%%  //Rules ------------------------------------------------------------------------------------------------------------
 
 //programa principal ------------------------------------------
 Programa_principal:
     MAIN ABRE_PARENTESES FECHA_PARENTESES Corpo
-    | error { yyerror("Verifique a estrutura do programa main"); }
     ; // não há tipos para a função main, sendo iniciada apenas por main diretamente
 
 Corpo:
@@ -142,9 +141,7 @@ Exp_unaria:
     | OPERADOR_ARITMETICO_UNARIO IDENTIFICADOR
     ;
 
-%%
-
-FILE *yyin;
+%%  //Code -------------------------------------------------------------------------------------------------------------
 
 extern void yyerror(const char *msg) {
     fprintf(stderr, "Erro de sintaxe na linha %d: %s\n", linhas, msg);

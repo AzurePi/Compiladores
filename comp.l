@@ -1,34 +1,35 @@
-%{	//Definitions
-    #include "analisador.h"
-  	#include <string.h>
-	#include <stdlib.h>
-	#include <stdio.h>
-    extern YYSTYPE yylval;	// variável para passar o valor dos tokens
+%{	//Definitions ------------------------------------------------------------------------------------------------------
+    #include "comp.tab.h"
 
-	int linhas=1, erros=0;
+    extern FILE *yyin;
+    extern void yyerror(const char *);
+
+    int linhas=1, erros=0;
 %}
 
+/* TODO: simplificação da definição de um identificador */
+/*TODO: adição da categoria "comparador"*/
+
 DIGITO	   [0-9]
-ID	       [A-Za-z][A-Za-z0-9]* // TODO: simplificação da definição de um identificador
+ID	       [A-Za-z][A-Za-z0-9]*
 ESPACO	   [\t\r" "]
-/* FLUXO	   se|senao|por|enquanto|execute|retorne
+/* FLUXO   se|senao|por|enquanto|execute|retorne
 TIPO	   inteiro|real|caractere|literal
 SEPARADOR  [,;{}[\]()]
 ATRIBUICAO "="|"+="|"-=" //TODO: removemos -= e += para simplificar */
 ARIT_UN	   "++"|"--"
 ARIT_BIN   "+"|"-"|"*"|"/"|"%"
 OP_LOGICO  "&&"|"||"
-COMPARADOR "=="|"!="|"<"|">"|"<="|">=" //TODO: adição da categoria "comparador"
+COMP		"=="|"!="|"<"|">"|"<="|">="
 
-%%	//Rules -----------------------------------------------------------------------
+%%	//Rules ------------------------------------------------------------------------------------------------------------
 {ESPACO}* 	//reconhece e ignora espaços em branco
 
 \n+ { linhas += yyleng; } //reconhece e contabiliza mudanças de linha
 
 "//"[^\n]*	 //reconhece e ignora comentários de uma única linha
 
-/* TODO: ao invés de termos todo um grupo de SEPARADORES, cada um é reconhecido individualmente */
-"("    { return ABRE_PARENTESES; }
+"("    { return ABRE_PARENTESES; } //TODO: ao invés de termos todo um grupo de SEPARADORES, cada um é reconhecido individualmente
 ")"    { return FECHA_PARENTESES; }
 "{"    { return ABRE_CHAVE; }
 "}"    { return FECHA_CHAVE; }
@@ -37,8 +38,7 @@ COMPARADOR "=="|"!="|"<"|">"|"<="|">=" //TODO: adição da categoria "comparador
 ","    { return VIRGULA; }
 ";"    { return PONTO_E_VIRGULA; }
 
-/*TODO: separamos "Palavra reservada" em seus constituintes; os tipos de variávies, e cada uma das esturturas de controle*/
-"real"			{ return TIPO_REAL; }
+"real"			{ return TIPO_REAL; } //TODO: separamos "Palavra reservada" em seus constituintes; os tipos de variávies, e cada uma das esturturas de controle
 "inteiro"       { return TIPO_INTEIRO; }
 "caractere"     { return TIPO_CARACTERE; }
 "literal"       { return TIPO_LITERAL; }
@@ -49,56 +49,30 @@ COMPARADOR "=="|"!="|"<"|">"|"<="|">=" //TODO: adição da categoria "comparador
 "execute"       { return EXECUTE; }
 "retorne"       { return RETORNE; }
 
-/*TODO: adicionamos reconhecimento da função main*/
-"main"          { return MAIN; }
+"main"          { return MAIN; } //TODO: adicionamos reconhecimento da função main
 
-/*TODO: dividimos o reconhecimento de operadores unários e binários*/
-{ARIT_UN}       { return OPERADOR_ARITMETICO_UNARIO; }
+{ARIT_UN}       { return OPERADOR_ARITMETICO_UNARIO; } //TODO: dividimos o reconhecimento de operadores unários e binários
 {ARIT_BIN}      { return OPERADOR_ARITMETICO_BINARIO; }
 {OP_LOGICO}     { return OPERADOR_LOGICO; }
 
-/*TODO: reconhecimento do operador de negação*/
-"!"    { return NEGACAO; }
+{COMP}  { return COMPARADOR; } //TODO: adicionamos o reconhecimento de comparadores
 
-/*TODO: adicionamos o reconhecimento de comparadores*/
-{COMPARADOR}    { return COMPARADOR; }
+"!"     { return NEGACAO; } //TODO: reconhecimento do operador de negação
+
+"="		{ return IGUAL; } //TODO: removemos os símbolos += e -= para simplificar a atribuição
+
+"-"?{DIGITO}+"."{DIGITO}+	{ return NUM_REAL; } //reconhece um número real (positivo ou negativo)
+"-"?{DIGITO}+				{ return NUM_INTEIRO; } //reconhece um número inteiro (positivo ou negativo)
+
+"'"[^']"'"			{ return CARACTERE; } //TODO: adicionamos reconhecimento de um caractere
+\"([^\"]|\\\")*\"   { return LITERAL; } //TODO: adicionamos reocnhecimento de uma string literal
 
 {ID}    { return IDENTIFICADOR; }
 
-"="		{ return IGUAL; }
-
-/*
-"-"?{DIGITO}+"."{DIGITO}*({ID}|[{}\[\]()])+ {
-	report_error("Número real com parte decimal incorreta", yytext, linhas);
-} //reconhece um erro, um número real com a parte decimal não-numérica
-*/
-
-"-"?{DIGITO}+"."{DIGITO}+ { return NUM_REAL; } //reconhece um número real (positivo ou negativo)
-
-/*
-"-"?{DIGITO}+({ID}|[{}\[\]()])+ {
-	report_error("Token inválido", yytext, linhas);
-} //reconhece um erro, um número seguido por um caractere não-dígito
-*/
-
-"-"?{DIGITO}+ { return NUM_INTEIRO; } //reconhece um número inteiro (positivo ou negativo)
-
-"'"[^']"'"	{ return CARACTERE; }
-\"([^\"]|\\\")*\"   { return LITERAL; }
-
 . {	yyerror("Token inválido"); erros++; } //reconhece como erro qualquer coisa que não se encaixe como regra válida
 
-%%
-
-//Code ---------------------------------------------------------------------------------
+%%  //Code -------------------------------------------------------------------------------------------------------------
 
 int yywrap() {
 	return 1;
-};
-
-int main() {
-	while(yylex());
-	printf("\nTotal de erros encontrados: %d\n", erros);
-	if (erros==0)
-		puts("\nCódigo analisado com sucesso!\n");
 }

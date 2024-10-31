@@ -11,7 +11,7 @@
 /*TODO: adição da categoria "comparador"*/
 
 DIGITO	   [0-9]
-ID	       [A-Za-z][A-Za-z0-9]*
+ID	       [A-Za-z_][A-Za-z0-9_]*
 ESPACO	   [\t\r" "]
 /* FLUXO   se|senao|por|enquanto|execute|retorne
 TIPO	   inteiro|real|caractere|literal
@@ -19,7 +19,7 @@ SEPARADOR  [,;{}[\]()]
 ATRIBUICAO "="|"+="|"-=" //TODO: removemos -= e += para simplificar */
 ARIT_UN	   "++"|"--"
 ARIT_BIN   "+"|"-"|"*"|"/"|"%"
-OP_LOGICO  "&&"|"||"
+OP_LOGICO  "&"|"|"
 COMP		"=="|"!="|"<"|">"|"<="|">="
 
 %%	//Rules ------------------------------------------------------------------------------------------------------------
@@ -64,8 +64,8 @@ COMP		"=="|"!="|"<"|">"|"<="|">="
 "-"?{DIGITO}+"."{DIGITO}+	{ return NUM_REAL; } //reconhece um número real (positivo ou negativo)
 "-"?{DIGITO}+				{ return NUM_INTEIRO; } //reconhece um número inteiro (positivo ou negativo)
 
-"'"[^']"'"			{ return CARACTERE; } //TODO: adicionamos reconhecimento de um caractere
-\"([^\"]|\\\")*\"   { return LITERAL; } //TODO: adicionamos reocnhecimento de uma string literal
+"\'"[^"\'"]"\'"    { return CARACTERE; } //TODO: adicionamos reconhecimento de um caractere
+\"([^\"]*)\"       { return LITERAL; } //TODO: adicionamos reconhecimento de uma string literal
 
 {ID}    { return IDENTIFICADOR; }
 

@@ -21,6 +21,7 @@
 %token VIRGULA PONTO_E_VIRGULA
 %token TIPO_REAL TIPO_INTEIRO TIPO_CARACTERE TIPO_LITERAL
 %token NUM_INTEIRO NUM_REAL CARACTERE LITERAL
+%token ASPAS CONTEUDO_LITERAL
 %token IDENTIFICADOR IGUAL
 %token OPERADOR_ARITMETICO_UNARIO OPERADOR_ARITMETICO_BINARIO
 %token OPERADOR_LOGICO COMPARADOR NEGACAO
@@ -96,7 +97,7 @@ Exp_aritmetica:
     Valor
     | Var
     | Exp_unaria
-    | Exp_aritmetica OPERADOR_ARITMETICO_BINARIO Exp_aritmetica
+    | Exp_aritmetica OPERADOR_ARITMETICO_BINARIO Exp_aritmetica { msg_sucesso("Expressão aritmética com operador binário"); }
     | ABRE_PARENTESES Exp_aritmetica FECHA_PARENTESES
     ;
 
@@ -104,7 +105,7 @@ Valor:
     NUM_INTEIRO { msg_sucesso("Valor - Número inteiro"); }
     | NUM_REAL { msg_sucesso("Valor - Número real"); }
     | CARACTERE { msg_sucesso("Valor - Caractere"); }
-    | LITERAL  { msg_sucesso("Valor - Literal"); }
+    | LITERAL { msg_sucesso("Valor - Literal"); }
     | error { yyerror("Valor inválido"); }
     ;
 

@@ -70,20 +70,22 @@ extern int yydebug;
     NUM_REAL = 271,                /* NUM_REAL  */
     CARACTERE = 272,               /* CARACTERE  */
     LITERAL = 273,                 /* LITERAL  */
-    IDENTIFICADOR = 274,           /* IDENTIFICADOR  */
-    IGUAL = 275,                   /* IGUAL  */
-    OPERADOR_ARITMETICO_UNARIO = 276, /* OPERADOR_ARITMETICO_UNARIO  */
-    OPERADOR_ARITMETICO_BINARIO = 277, /* OPERADOR_ARITMETICO_BINARIO  */
-    OPERADOR_LOGICO = 278,         /* OPERADOR_LOGICO  */
-    COMPARADOR = 279,              /* COMPARADOR  */
-    NEGACAO = 280,                 /* NEGACAO  */
-    SE = 281,                      /* SE  */
-    SENAO = 282,                   /* SENAO  */
-    POR = 283,                     /* POR  */
-    ENQUANTO = 284,                /* ENQUANTO  */
-    EXECUTE = 285,                 /* EXECUTE  */
-    RETORNE = 286,                 /* RETORNE  */
-    MAIN = 287                     /* MAIN  */
+    ASPAS = 274,                   /* ASPAS  */
+    CONTEUDO_LITERAL = 275,        /* CONTEUDO_LITERAL  */
+    IDENTIFICADOR = 276,           /* IDENTIFICADOR  */
+    IGUAL = 277,                   /* IGUAL  */
+    OPERADOR_ARITMETICO_UNARIO = 278, /* OPERADOR_ARITMETICO_UNARIO  */
+    OPERADOR_ARITMETICO_BINARIO = 279, /* OPERADOR_ARITMETICO_BINARIO  */
+    OPERADOR_LOGICO = 280,         /* OPERADOR_LOGICO  */
+    COMPARADOR = 281,              /* COMPARADOR  */
+    NEGACAO = 282,                 /* NEGACAO  */
+    SE = 283,                      /* SE  */
+    SENAO = 284,                   /* SENAO  */
+    POR = 285,                     /* POR  */
+    ENQUANTO = 286,                /* ENQUANTO  */
+    EXECUTE = 287,                 /* EXECUTE  */
+    RETORNE = 288,                 /* RETORNE  */
+    MAIN = 289                     /* MAIN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

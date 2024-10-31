@@ -47,7 +47,6 @@ COMP		"=="|"!="|"<"|">"|"<="|">="
 "por"           { return POR; }
 "enquanto"      { return ENQUANTO; }
 "execute"       { return EXECUTE; }
-"retorne"       { return RETORNE; }
 
 "main"          { return MAIN; } //TODO: adicionamos reconhecimento da função main
 

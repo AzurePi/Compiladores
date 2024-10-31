@@ -14,7 +14,7 @@ main() {
     caractere letra[9];
     literal x;
 
-    se (h > 5 & r < y) {
+    se (h > 5 && r < y) {
         por (x = 0, x < 10, x = x + 1) {
             resultado = resultado + 1.5;
             x++;
@@ -29,7 +29,7 @@ main() {
     }
     execute {
         resultado = resultado / 3;
-    } enquanto ("palavra" != 15.6 | ((y + 5) < 4));
+    } enquanto ("palavra" != 15.6 || ((y + 5) < 4));
 
     x = 3.5 + "palavra";
 }
